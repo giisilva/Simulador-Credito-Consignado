@@ -1,51 +1,208 @@
+:root {
+  --azul: #0077b6;
+  --azul-escuro: #023e8a;
+  --verde: #00b4d8;
+  --cinza-fundo: #f5f6fa;
+  --texto: #333;
+  --branco: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  padding: 0;
+  background: var(--cinza-fundo);
+  color: var(--texto);
   line-height: 1.6;
-  background-color: #f7f7f7;
 }
 
+/* MENU */
 header {
-  background-color: #0078d7;
+  background: #0056a3;
   padding: 15px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-nav {
+.navbar {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
-nav a {
-  color: white;
+.navbar a {
+  color: var(--branco);
   text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 5px;
   font-weight: 600;
-  padding: 5px 10px;
   transition: background 0.3s;
 }
 
-nav a:hover {
-  background-color: rgba(255,255,255,0.2);
-  border-radius: 5px;
+.navbar a:hover,
+.navbar .highlight {
+  background: rgba(255,255,255,0.2);
 }
 
-section {
-  padding: 50px 20px;
-  max-width: 800px;
-  margin: auto;
-  background: white;
+/* BANNER */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 50px 60px;
+  background: linear-gradient(120deg, var(--azul), var(--verde));
+  color: var(--branco);
+  text-align: left;
+}
+
+.hero-text {
+  max-width: 600px;
+  text-align: left;
+}
+
+.hero h1 {
+  font-size: 2.8rem; /* aumenta o tamanho da fonte */
+  margin-bottom: 15px;
+  text-align: left; /* caso queira manter alinhado à esquerda */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero p {
   margin-bottom: 20px;
-  border-radius: 10px;
+  font-size: 1.2rem; /* adiciona esse para deixar o texto mais legível */
+  text-align: left; /* se quiser acompanhar o alinhamento */
+}
+
+.btn-hero {
+  background: var(--branco);
+  color: var(--azul);
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-hero:hover {
+  background: var(--verde);
+  color: var(--branco);
+}
+
+.hero-img {
+  width: 300px;
+  max-width: 90%;
+  margin-top: 20px;
+}
+
+/* SEÇÕES */
+.secao-texto {
+  background: none; /* sem fundo branco */
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 20px;
+  text-align: left;
+  color: var(--texto);
+  line-height: 1.8;
+}
+
+.secao-texto h2 {
+  color: var(--azul-escuro);
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.content-section {
+  background: var(--branco);
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px 25px;
+  border-radius: 18px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-h1, h2 {
+.content-section.alt {
+  background: #f0f7ff;
+}
+
+h2 {
   text-align: center;
-  color: #0078d7;
+  color: var(--azul-escuro);
+}
+
+/* GRID DE VANTAGENS */
+.secao-vantagens {
+  background-color: #f9fbff; /* integra no fundo */
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.secao-vantagens h2 {
+  color: #003366;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.secao-vantagens .subtitulo {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 50px;
+}
+
+.container-vantagens {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.card-vantagem {
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  width: 280px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.card-vantagem:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-vantagem i {
+  font-size: 40px;
+  color: #004aad;
+  margin-bottom: 15px;
+}
+
+.card-vantagem h3 {
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.card-vantagem p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* FORMULÁRIO */
+.simulador {
+  margin-top: 20px;
+  background: var(--branco);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 form label {
@@ -56,31 +213,133 @@ form label {
 
 form input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-top: 5px;
-  border-radius: 5px;
   border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
 form button {
   margin-top: 20px;
   width: 100%;
-  padding: 10px;
-  background-color: #0078d7;
-  color: white;
+  padding: 12px;
+  background: var(--azul);
+  color: var(--branco);
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 6px;
   font-weight: 600;
+  cursor: pointer;
   transition: background 0.3s;
 }
 
 form button:hover {
-  background-color: #005fa3;
+  background: var(--azul-escuro);
 }
 
 #resultado {
-  margin-top: 30px;
+  margin-top: 25px;
   text-align: center;
   font-size: 18px;
+  color: var(--azul-escuro);
+}
+
+/* ===== CARD DE IMAGEM ===== */
+.card-imagem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 400px; /* Aumenta o tamanho do card */
+  border-radius: 25px; /* Bordas mais arredondadas */
+  overflow: hidden;
+  background: var(--branco);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-imagem:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-imagem img {
+  width: 100%; /* Ocupa toda a largura do card */
+  max-width: 450px; /* Limita o tamanho pra não estourar */
+  height: auto; /* Mantém proporção */
+  border-radius: 25px; /* Bordas arredondadas da imagem também */
+  object-fit: cover;
+  display: block;
+  margin: 0 auto; /* Centraliza horizontalmente */
+}
+.imagem-esquerda .conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+.imagem-esquerda .imagem img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 15px;
+  object-fit: cover;
+  display: block;
+}
+
+.imagem-esquerda .texto {
+  flex: 1;
+  color: var(--texto);
+}
+
+.imagem-esquerda .texto h2 {
+  color: var(--azul-escuro);
+  font-size: 2rem;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.imagem-esquerda .texto p {
+  font-size: 1rem;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .imagem-esquerda .conteudo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .imagem-esquerda .imagem img {
+    max-width: 90%;
+  }
+
+  .imagem-esquerda .texto {
+    text-align: center;
+  }
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 15px;
+  background: var(--azul-escuro);
+  color: var(--branco);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+  }
+  .grid {
+    flex-direction: column;
+    align-items: center;
+  }
 }

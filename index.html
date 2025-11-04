@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador de Crédito Consignado</title>
+  <title> SimulaCred - Simulador de Crédito Consignado</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,83 +11,125 @@
 
   <!-- MENU -->
   <header>
-    <nav>
+    <nav class="navbar">
+      <a href="#inicio"class="highlight">SimulaCred</a>
       <a href="#o-que-e">O que é?</a>
       <a href="#vantagens">Vantagens</a>
       <a href="#funciona">Como funciona</a>
       <a href="#obter">Como obter</a>
       <a href="#seguranca">Dicas de Segurança</a>
-      <a href="#simulador">Simulador</a>
+      <a href="#simulador" class="highlight">Simulador</a>
     </nav>
   </header>
 
-  <!-- SEÇÃO: O que é? -->
-  <section id="o-que-e">
-    <h2>O que é o Empréstimo Consignado?</h2>
-    <p>O empréstimo consignado é um tipo de crédito pessoal com parcelas descontadas diretamente do salário ou benefício. Ele geralmente possui juros menores do que outros tipos de empréstimos.</p>
+    <!-- BANNER -->
+  <section class="hero" id="inicio">
+    <div class="hero-text">
+      <h1>Simule, Planeje e Escolha com Segurança</h1>
+      <p>Descubra as melhores opções de crédito consignado de forma simples e transparente.</p>
+      <a href="#simulador" class="btn-hero">Fazer Simulação</a>
+    </div>
+    <div class="card-imagem">
+      <img src="img/banner_homem_simulando.jpg" alt="Pessoa simulando empréstimo online" class="hero-img">
+    </div>    
   </section>
 
-  <!-- SEÇÃO: Vantagens -->
-  <section id="vantagens">
-    <h2>Vantagens do Empréstimo Consignado</h2>
-    <ul>
-      <li>Juros mais baixos</li>
-      <li>Parcelamento fixo e previsível</li>
-      <li>Desconto automático da folha de pagamento</li>
-      <li>Menor risco de inadimplência</li>
-    </ul>
-  </section>
+  <!-- SEÇÃO: O que é? -->
+<section id="o-que-e" class="secao-texto imagem-esquerda">
+  <div class="conteudo">
+    <div class="imagem">
+      <img src="img/imagem_2.jpg" alt="Pessoa analisando opções de empréstimo consignado">
+    </div>
+    <div class="texto">
+      <h2>O que é o Empréstimo Consignado?</h2>
+      <p>O empréstimo consignado é uma modalidade de crédito em que as parcelas são descontadas diretamente da folha de pagamento ou benefício do INSS. Por isso, possui taxas de juros menores e maior segurança para quem contrata.</p>
+      <p>Essa opção é bastante utilizada por aposentados, pensionistas, servidores públicos e trabalhadores de empresas conveniadas, pois oferece prazos maiores e facilidade na aprovação.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO: Vantagens -->
+<section id="vantagens" class="secao-vantagens">
+  <h2> Vantagens do Empréstimo Consignado</h2>
+  <p class="subtitulo">Descubra por que essa modalidade é uma das mais seguras e econômicas do mercado.</p>
+
+  <div class="container-vantagens">
+    <div class="card-vantagem">
+      <i class="fas fa-percent" aria-hidden="true"></i>
+      <h3>💰 Juros Reduzidos</h3>
+      <p>Taxas de juros menores do que empréstimos comuns.</p>
+    </div>
+
+    <div class="card-vantagem">
+      <i class="fas fa-calendar-check" aria-hidden="true"></i>
+      <h3>📅 Parcelas Fixas</h3>
+      <p>Pagamentos previsíveis com desconto automático da folha.</p>
+    </div>
+
+    <div class="card-vantagem">
+      <i class="fas fa-shield-alt" aria-hidden="true"></i>
+      <h3>🔒 Segurança</h3>
+      <p>Menor risco de inadimplência e mais controle financeiro.</p>
+    </div>
+  </div>
+</section>
+
 
   <!-- SEÇÃO: Como funciona -->
-  <section id="funciona">
+  <section id="funciona" class="content-section alt">
     <h2>Como funciona</h2>
     <ol>
-      <li>Escolha o valor do empréstimo, taxa e prazo no simulador.</li>
-      <li>O sistema calcula as parcelas e o total a pagar.</li>
-      <li>Você decide se quer solicitar o crédito junto à instituição.</li>
-      <li>As parcelas são descontadas automaticamente do seu salário ou benefício.</li>
+      <li>Informe o valor, taxa e prazo no simulador.</li>
+      <li>Veja o cálculo automático das parcelas.</li>
+      <li>Compare e escolha a melhor opção.</li>
+      <li>Solicite o crédito à instituição de forma segura.</li>
     </ol>
   </section>
 
   <!-- SEÇÃO: Como obter -->
-  <section id="obter">
+  <section id="obter" class="content-section">
     <h2>Como obter seu Empréstimo Consignado</h2>
-    <p>Para obter um empréstimo consignado, você precisa:</p>
     <ul>
-      <li>Ser funcionário de empresa conveniada ou aposentado/pensionista do INSS</li>
-      <li>Apresentar documentos pessoais e comprovante de renda</li>
-      <li>Solicitar o crédito junto a bancos ou financeiras autorizadas</li>
+      <li>Ser funcionário de empresa conveniada ou beneficiário do INSS</li>
+      <li>Apresentar documentos e comprovantes de renda</li>
+      <li>Escolher um banco ou financeira autorizada</li>
     </ul>
   </section>
 
   <!-- SEÇÃO: Dicas de Segurança -->
-  <section id="seguranca">
+  <section id="seguranca" class="content-section alt">
     <h2>Dicas de Segurança</h2>
     <ul>
-      <li>Nunca forneça dados pessoais por telefone ou e-mail suspeito</li>
-      <li>Verifique se a instituição é confiável</li>
-      <li>Compare taxas e prazos antes de assinar</li>
-      <li>Evite empréstimos de fontes desconhecidas</li>
+      <li>🔐 Não compartilhe dados por telefone ou e-mails suspeitos</li>
+      <li>🏦 Verifique se a instituição é autorizada pelo Banco Central</li>
+      <li>💡 Compare taxas e leia o contrato com atenção</li>
+      <li>🚫 Desconfie de promessas de crédito “sem consulta”</li>
     </ul>
   </section>
 
-    <!-- SEÇÃO: Simulador -->
-  <section id="simulador">
-    <h1>Simulador de Crédito Consignado</h1>
-    <form id="form-simulador">
-      <label>Valor do Empréstimo (R$)</label>
-      <input type="number" id="valor" required>
+  <!-- SEÇÃO: Simulador -->
+  <section id="simulador" class="content-section">
+    <h2>Simulador de Crédito Consignado</h2>
+    <div class="simulador">
+      <form id="form-simulador" aria-label="Simulador de Empréstimo">
+        <label for="valor">Valor do Empréstimo (R$)</label>
+        <input type="number" id="valor" required aria-required="true">
 
-      <label>Taxa de Juros (% ao mês)</label>
-      <input type="number" id="taxa" required>
+        <label for="taxa">Taxa de Juros (% ao mês)</label>
+        <input type="number" id="taxa" required aria-required="true">
 
-      <label>Prazo (meses)</label>
-      <input type="number" id="prazo" required>
+        <label for="prazo">Prazo (meses)</label>
+        <input type="number" id="prazo" required aria-required="true">
 
-      <button type="submit">Simular</button>
-    </form>
-    <div id="resultado"></div>
+        <button type="submit">Simular</button>
+      </form>
+      <div id="resultado" aria-live="polite"></div>
+    </div>
   </section>
+
+  <footer>
+    <p>© 2025 SimulaCred | Desenvolvido por Adriano Ferreira, Giovanna Silva Ribeiro, Samille Soares</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>

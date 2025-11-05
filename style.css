@@ -1,10 +1,13 @@
 :root {
-  --azul: #0077b6;
-  --azul-escuro: #023e8a;
-  --verde: #00b4d8;
-  --cinza-fundo: #f5f6fa;
-  --texto: #333;
-  --branco: #fff;
+  --menu: #070e1a;
+  --primaria: #0D1B2A;
+  --secundaria: #1B263B;     /* Azul Médio — navegação, títulos */
+  --destaque: #778DA9;       /* Prata — ícones, bordas sutis */
+  --fundo-claro: #E0E1DD;    /* Cinza Suave — fundos neutros */
+  --branco: #FFFFFF;         /* Branco puro — áreas de leitura */
+  --texto: #1B263B;          /* Texto padrão, contraste alto */
+  --sucesso: #2E8B57;       
+  --erro: #D62828;        
 }
 
 * {
@@ -15,14 +18,20 @@
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: var(--cinza-fundo);
+  background: var(--fundo-claro);
   color: var(--texto);
   line-height: 1.6;
 }
 
 /* MENU */
+.logo img {
+  height: 30px;  /* tamanho aproximado do texto do menu */
+  width: auto;
+  vertical-align: middle;
+}
+
 header {
-  background: #0056a3;
+  background: var(--menu);
   padding: 15px 0;
   position: sticky;
   top: 0;
@@ -47,7 +56,7 @@ header {
 
 .navbar a:hover,
 .navbar .highlight {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* BANNER */
@@ -57,7 +66,7 @@ header {
   justify-content: space-between;
   flex-wrap: wrap;
   padding: 50px 60px;
-  background: linear-gradient(120deg, var(--azul), var(--verde));
+  background: linear-gradient(120deg, var(--primaria), var(--secundaria));
   color: var(--branco);
   text-align: left;
 }
@@ -82,7 +91,7 @@ header {
 
 .btn-hero {
   background: var(--branco);
-  color: var(--azul);
+  color: var(--primaria);
   padding: 10px 20px;
   border-radius: 6px;
   font-weight: 800;
@@ -91,7 +100,7 @@ header {
 }
 
 .btn-hero:hover {
-  background: var(--verde);
+  background: var(--destaque);
   color: var(--branco);
 }
 
@@ -113,7 +122,7 @@ header {
 }
 
 .secao-texto h2 {
-  color: var(--azul-escuro);
+  color: var(--primaria);
   font-size: 1.8rem;
   margin-bottom: 15px;
   text-align: left;
@@ -129,7 +138,7 @@ header {
 }
 
 .content-section.alt {
-  background: #f0f7ff;
+  background: var(--fundo-claro);
 }
 
 h2 {
@@ -139,13 +148,13 @@ h2 {
 
 /* GRID DE VANTAGENS */
 .secao-vantagens {
-  background-color: #f9fbff; /* integra no fundo */
+  background-color: var(--fundo-claro);
   padding: 80px 20px;
   text-align: center;
 }
 
 .secao-vantagens h2 {
-  color: #003366;
+   color: var(--primaria);
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 10px;
@@ -165,7 +174,7 @@ h2 {
 }
 
 .card-vantagem {
-  background-color: #fff;
+  background-color: var(--branco);
   border-radius: 18px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   width: 280px;
@@ -180,7 +189,7 @@ h2 {
 
 .card-vantagem i {
   font-size: 40px;
-  color: #004aad;
+  color: var(--secundaria);
   margin-bottom: 15px;
 }
 
@@ -215,7 +224,7 @@ form input {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--destaque);
   border-radius: 6px;
 }
 
@@ -223,7 +232,7 @@ form button {
   margin-top: 20px;
   width: 100%;
   padding: 12px;
-  background: var(--azul);
+  background: var(--primaria);
   color: var(--branco);
   border: none;
   border-radius: 6px;
@@ -233,7 +242,7 @@ form button {
 }
 
 form button:hover {
-  background: var(--azul-escuro);
+  background: var(--secundaria);
 }
 
 #resultado {
@@ -243,6 +252,48 @@ form button:hover {
   color: var(--azul-escuro);
 }
 
+.info-btn {
+  background: var(--branco);
+  color: var(--texto);
+  border: 1px solid var(--texto);
+  border-radius: 100%;
+  width: 8px;
+  height: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+      position: relative;
+    top: -10px; /* faz o botão ficar levemente acima */
+}
+
+.info-btn:hover {
+  background: var(--azul);
+  color: var(--branco);
+  border-color: var(--azul);
+}
+/* Tooltip escondido por padrão */
+.tooltip {
+  display: none;
+  position: absolute;
+  background-color: var(--branco);
+  color: var(--texto);
+  border: 1px solid var(--texto);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  max-width: 220px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.tooltip.show {
+  display: block;
+}
 /* ===== CARD DE IMAGEM ===== */
 .card-imagem {
   display: flex;
@@ -309,37 +360,17 @@ form button:hover {
   text-align: justify;
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
-  .imagem-esquerda .conteudo {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .imagem-esquerda .imagem img {
-    max-width: 90%;
-  }
-
-  .imagem-esquerda .texto {
-    text-align: center;
-  }
-}
-
-/* FOOTER */
+/* ====== FOOTER ====== */
 footer {
   text-align: center;
   padding: 15px;
-  background: var(--azul-escuro);
+  background: var(--secundaria);
   color: var(--branco);
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
-  .hero {
-    flex-direction: column;
-  }
-  .grid {
-    flex-direction: column;
-    align-items: center;
-  }
+/* ====== ACESSIBILIDADE ====== */
+:focus {
+  outline: 3px solid var(--destaque);
+  outline-offset: 3px;
 }

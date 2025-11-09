@@ -1,161 +1,680 @@
-let graficoLinha = null;
-let graficoPizza = null;
+// ===== VARIÁVEIS GLOBAIS =====
+let graficoLinha, graficoPizza, graficoComparacao;
 
-// === FORMATAÇÃO DO CAMPO VALOR ===
-const inputValor = document.getElementById('valor');
+// ===== LIMPAR FORMULÁRIO AO CARREGAR A PÁGINA =====
+window.addEventListener('load', function() {
+  document.getElementById('valor').value = '';
+  document.getElementById('taxa').value = '';
+  document.getElementById('prazo').value = '';
+  
+  // Esconde a seção de resultado se estiver visível
+  document.querySelector('.secao-resultado-completa').classList.add('oculto');
+});
 
-// Formata com ponto nos milhares, sem limite
-inputValor.addEventListener('input', function (e) {
-  let valor = e.target.value;
+// ===== SIMULADOR DE EMPRÉSTIMO =====
+document.getElementById('form-simulador').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-  // Remove tudo que não for número
-  valor = valor.replace(/\D/g, '');
+  const valorInput = document.getElementById('valor').value;
+  const taxaInput = document.getElementById('taxa').value;
+  const prazo = parseInt(document.getElementById('prazo').value);
 
-  if (valor === '') {
-    e.target.value = '';
+  // Limpa os valores (remove pontos, vírgulas e R$)
+  const valor = parseFloat(valorInput.replace(/[^\d,]/g, '').replace(',', '.'));
+  const taxa = parseFloat(taxaInput.replace(',', '.')) / 100;
+
+  if (isNaN(valor) || isNaN(taxa) || isNaN(prazo) || valor <= 0 || taxa <= 0 || prazo <= 0) {
+    alert('Por favor, preencha todos os campos corretamente.');
     return;
   }
 
-  // Converte para número e formata com ponto como separador de milhar
-  e.target.value = valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-});
-
-// === CÁLCULO DO EMPRÉSTIMO ===
-document.getElementById('form-simulador').addEventListener('submit', function(event) {
-  event.preventDefault();
-
-  // Converte o valor (com pontos) para número
-  const valor = parseFloat(document.getElementById('valor').value.replace(/\./g, ''));
-  const taxa = parseFloat(document.getElementById('taxa').value.replace(',', '.')) / 100;
-  const prazo = parseInt(document.getElementById('prazo').value);
-
-  // Cálculos
-  const parcela = (valor * taxa) / (1 - Math.pow(1 + taxa, -prazo));
+  // Cálculo da parcela (Tabela Price)
+  const parcela = valor * (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1);
   const totalPago = parcela * prazo;
   const totalJuros = totalPago - valor;
 
-  // Mostra resultado formatado com vírgula e 2 casas decimais
-  const resultadoDiv = document.getElementById('resultado');
-  resultadoDiv.innerHTML = `
-    <h2>Resultado da Simulação</h2>
-    <p>Parcela mensal: <strong>R$ ${parcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
-    <p>Total pago: <strong>R$ ${totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
-    <p>Total de juros: <strong>R$ ${totalJuros.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
+  // Exibe resultado
+  const resultado = document.getElementById('resultado');
+  resultado.innerHTML = `
+    <p><strong>Valor da Parcela:</strong> R$ ${parcela.toFixed(2)}</p>
+    <p><strong>Total a Pagar:</strong> R$ ${totalPago.toFixed(2)}</p>
+    <p><strong>Total de Juros:</strong> R$ ${totalJuros.toFixed(2)}</p>
   `;
-  // Array para os gráficos
-  const parcelaMensal = Array(prazo).fill(parcela);
-  const totais = parcelaMensal.map((_, i) => parcela * (i + 1));
-  const juros = totais.map(t => t - (valor * (t / totalPago)));
 
-  //<!-- Gráfico de Linha -->
-  const ctxLinha = document.getElementById('graficoLinha');
+  // Mostra a seção de resultado
+  document.querySelector('.secao-resultado-completa').classList.remove('oculto');
 
-  if (graficoLinha) grafico.destroy();
+  // Gera os gráficos
+  gerarGraficos(valor, totalJuros, taxa, prazo);
+
+  // Scroll suave até o resultado
+  setTimeout(() => {
+    document.querySelector('.secao-resultado-completa').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+});
+
+// ===== FORMATAÇÃO DE INPUTS =====
+document.getElementById('valor').addEventListener('input', function(e) {
+  let valor = e.target.value.replace(/\D/g, '');
+  valor = (valor / 100).toFixed(2);
+  valor = valor.replace('.', ',');
+  valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+  e.target.value = valor;
+});
+
+document.getElementById('taxa').addEventListener('input', function(e) {
+  let valor = e.target.value.replace(/[^\d,]/g, '');
+  e.target.value = valor;
+});
+
+// ===== TOOLTIP DO BOTÃO DE AJUDA =====
+const taxaInfoBtn = document.getElementById('taxa-info');
+const tooltip = document.getElementById('tooltip');
+
+taxaInfoBtn.addEventListener('mouseenter', function(e) {
+  const rect = taxaInfoBtn.getBoundingClientRect();
+  const formRect = document.querySelector('.hero-simulador form').getBoundingClientRect();
+  
+  tooltip.style.position = 'absolute';
+  tooltip.style.left = '0';
+  tooltip.style.top = '100%';
+  tooltip.style.marginTop = '5px';
+  tooltip.classList.add('show');
+});
+
+taxaInfoBtn.addEventListener('mouseleave', function(e) {
+  // Pequeno delay para permitir que o mouse entre no tooltip se necessário
+  setTimeout(() => {
+    tooltip.classList.remove('show');
+  }, 100);
+});
+
+// Mantém o tooltip visível quando o mouse está sobre ele
+tooltip.addEventListener('mouseenter', function() {
+  tooltip.classList.add('show');
+});
+
+tooltip.addEventListener('mouseleave', function() {
+  tooltip.classList.remove('show');
+});
+
+// ===== FUNÇÃO PARA GERAR GRÁFICOS =====
+function gerarGraficos(valor, totalJuros, taxa, prazo) {
+  // Destrói gráficos anteriores se existirem
+  if (graficoLinha) graficoLinha.destroy();
+  if (graficoPizza) graficoPizza.destroy();
+
+  // Calcula os valores
+  const parcela = valor * (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1);
+  const totalPago = parcela * prazo;
+
+  // Gráfico de Linha - Evolução dos Valores do Empréstimo
+  const ctxLinha = document.getElementById('graficoLinha').getContext('2d');
+  const dadosEvolucao = calcularEvolucaoValores(valor, taxa, prazo, parcela);
+
+  // Criar gradientes para as linhas
+  const gradienteParcela = ctxLinha.createLinearGradient(0, 0, 0, 350);
+  gradienteParcela.addColorStop(0, 'rgba(13, 24, 42, 0.8)');
+  gradienteParcela.addColorStop(1, 'rgba(13, 24, 42, 0.3)');
+
+  const gradienteTotalPago = ctxLinha.createLinearGradient(0, 0, 0, 350);
+  gradienteTotalPago.addColorStop(0, 'rgba(119, 141, 169, 0.8)');
+  gradienteTotalPago.addColorStop(1, 'rgba(119, 141, 169, 0.3)');
+
+  const gradienteJuros = ctxLinha.createLinearGradient(0, 0, 0, 350);
+  gradienteJuros.addColorStop(0, 'rgba(160, 174, 192, 0.8)');
+  gradienteJuros.addColorStop(1, 'rgba(160, 174, 192, 0.3)');
 
   graficoLinha = new Chart(ctxLinha, {
     type: 'line',
     data: {
-      labels: Array.from({ length: prazo}, (_, i) => `Mês ${i+1}`),
+      labels: dadosEvolucao.meses,
       datasets: [
         {
-          label: 'Parcela Mensal (R$)',
-          data: parcelaMensal,
-          fill: false,
-          borderColor: '#36A2EB',
-          tension: 0.2
+          label: 'Parcela Mensal',
+          data: dadosEvolucao.parcelas,
+          borderColor: '#0D182A',
+          backgroundColor: gradienteParcela,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#0D182A',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#0D182A',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3
         },
         {
-          label: 'Total Pago (R$)',
-          data: totais,
-          borderColor: '#4BC0C0',
-          backgroundColor: '#4BC0C033',
-          fill: false,
-          tension: 0.2
+          label: 'Total Pago',
+          data: dadosEvolucao.totaisPagos,
+          borderColor: '#778DA9',
+          backgroundColor: gradienteTotalPago,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#778DA9',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#778DA9',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3
         },
         {
-          label: 'Total de Juros (R$)',
-          data: juros,
-          borderColor: '#FF6384',
-          backgroundColor: '#FF638433',
-          fill: false,
-          tension: 0.2
+          label: 'Total de Juros',
+          data: dadosEvolucao.totaisJuros,
+          borderColor: '#A0AEC0',
+          backgroundColor: gradienteJuros,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#A0AEC0',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#A0AEC0',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3
         }
       ]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 10,
+          left: 10,
+          right: 10
+        }
+      },
       plugins: {
         title: {
           display: true,
-          text: 'Evolução dos Valores do Empréstimo'
+          text: 'Evolução dos Valores do Empréstimo',
+          font: {
+            size: 17,
+            weight: 'bold',
+            family: "'Segoe UI', 'Inter', sans-serif"
+          },
+          color: '#0F172A',
+          padding: {
+            top: 10,
+            bottom: 25
+          }
         },
         legend: {
-          position: 'bottom'
+          display: true,
+          position: 'bottom',
+          labels: {
+            font: { 
+              size: 13, 
+              weight: '600',
+              family: "'Segoe UI', 'Inter', sans-serif"
+            },
+            color: '#1E293B',
+            padding: 18,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 10,
+            boxHeight: 10
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(13, 24, 42, 0.95)',
+          titleFont: { 
+            size: 14, 
+            family: "'Segoe UI', 'Inter', sans-serif", 
+            weight: 'bold' 
+          },
+          bodyFont: { 
+            size: 13, 
+            family: "'Segoe UI', 'Inter', sans-serif" 
+          },
+          padding: 14,
+          cornerRadius: 10,
+          displayColors: true,
+          boxWidth: 12,
+          boxHeight: 12,
+          boxPadding: 6,
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+          }
         }
       },
       scales: {
         y: {
           beginAtZero: true,
-          title: {display: true, text: 'Valor (R$)'}
+          ticks: {
+            callback: function(value) {
+              return 'R$ ' + value.toLocaleString('pt-BR');
+            },
+            font: {
+              size: 12,
+              family: "'Segoe UI', 'Inter', sans-serif",
+              weight: '500'
+            },
+            color: '#94A3B8',
+            padding: 10
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.12)',
+            drawBorder: false,
+            lineWidth: 1
+          },
+          border: {
+            display: false
+          }
         },
         x: {
-          title: {display: true, text: 'Meses'}
+          ticks: {
+            font: {
+              size: 11,
+              family: "'Segoe UI', 'Inter', sans-serif",
+              weight: '500'
+            },
+            color: '#64748B',
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 10
+          },
+          grid: {
+            display: false
+          },
+          border: {
+            display: false
+          }
         }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeInOutQuart'
       }
     }
   });
 
-  //<!-- Gráfico de Pizza -->
-  const ctxPizza = document.getElementById('graficoPizza');
-
-  if (graficoPizza) grafico.destroy();
+  // Gráfico de Pizza - Valor Emprestado vs Juros
+  const ctxPizza = document.getElementById('graficoPizza').getContext('2d');
 
   graficoPizza = new Chart(ctxPizza, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
-      labels: ['Valor Emprestado', 'Juros Totais'],
-      datasets: [
-        {
-          data: [valor, totalJuros],
-          backgroundColor: ['#36A2EB', '#FF6384'],
-          borderColor: '#fff',
-          borderWidth: 2
-        }
-      ]
+      labels: ['Valor Emprestado', 'Total de Juros'],
+      datasets: [{
+        data: [valor, totalJuros],
+        backgroundColor: ['#0D182A', '#778DA9'],
+        borderWidth: 4,
+        borderColor: '#fff',
+        hoverBorderWidth: 5,
+        hoverBorderColor: '#fff'
+      }]
     },
     options: {
       responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Composição do Total Pago'
-        },
-        legend: {
-          position: 'bottom'
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 10,
+          bottom: 10
         }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { 
+              size: 13, 
+              weight: 'bold', 
+              family: "'Segoe UI', 'Inter', sans-serif" 
+            },
+            padding: 18,
+            color: '#1E293B',
+            boxWidth: 20,
+            boxHeight: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(13, 24, 42, 0.95)',
+          titleFont: { 
+            size: 14, 
+            family: "'Segoe UI', 'Inter', sans-serif" 
+          },
+          bodyFont: { 
+            size: 13, 
+            family: "'Segoe UI', 'Inter', sans-serif" 
+          },
+          padding: 14,
+          cornerRadius: 10,
+          callbacks: {
+            label: function(context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ' (' + percentage + '%)';
+            }
+          }
+        }
+      },
+      animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 2000,
+        easing: 'easeInOutQuart'
       }
+    }
+  });
+}
+
+// ===== FUNÇÃO AUXILIAR - CALCULAR EVOLUÇÃO DOS VALORES =====
+function calcularEvolucaoValores(valor, taxa, prazo, parcela) {
+  const meses = [];
+  const parcelas = [];
+  const totaisPagos = [];
+  const totaisJuros = [];
+  
+  let saldo = valor;
+  let totalPagoAcumulado = 0;
+  let totalJurosAcumulado = 0;
+
+  for (let i = 1; i <= prazo; i++) {
+    meses.push('Mês ' + i);
+    
+    // Parcela mensal é constante
+    parcelas.push(parseFloat(parcela.toFixed(2)));
+    
+    // Calcula juros do mês
+    const jurosMes = saldo * taxa;
+    const amortizacao = parcela - jurosMes;
+    
+    // Acumula valores
+    totalPagoAcumulado += parcela;
+    totalJurosAcumulado += jurosMes;
+    
+    totaisPagos.push(parseFloat(totalPagoAcumulado.toFixed(2)));
+    totaisJuros.push(parseFloat(totalJurosAcumulado.toFixed(2)));
+    
+    // Atualiza saldo
+    saldo -= amortizacao;
+    if (saldo < 0) saldo = 0;
+  }
+
+  return { meses, parcelas, totaisPagos, totaisJuros };
+}
+
+// ===== GRÁFICO DE COMPARAÇÃO DE TAXAS =====
+window.addEventListener('load', function() {
+  const ctxComparacao = document.getElementById('graficoComparacao');
+  
+  if (!ctxComparacao) return;
+
+  const ctx = ctxComparacao.getContext('2d');
+
+  // Gradientes para as barras
+  const gradiente1 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradiente1.addColorStop(0, '#1a2332');
+  gradiente1.addColorStop(1, '#0D182A');
+
+  const gradiente2 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradiente2.addColorStop(0, '#6B7A8F');
+  gradiente2.addColorStop(1, '#4A5568');
+
+  const gradiente3 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradiente3.addColorStop(0, '#A0AEC0');
+  gradiente3.addColorStop(1, '#718096');
+
+  graficoComparacao = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Consignado INSS¹', 'Empréstimo Pessoal²', 'Cartão de Crédito²'],
+      datasets: [{
+        data: [1.85, 7.04, 15.46],
+        backgroundColor: [gradiente1, gradiente2, gradiente3],
+        borderRadius: 30,
+        borderSkipped: false,
+        barThickness: 110,
+        maxBarThickness: 120
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 70,
+          bottom: 30,
+          left: 30,
+          right: 30
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 18,
+          ticks: {
+            stepSize: 6,
+            callback: function(value) {
+              return value + '%';
+            },
+            font: {
+              size: 12,
+              family: "'Segoe UI', 'Inter', sans-serif",
+              weight: '500'
+            },
+            color: '#94A3B8',
+            padding: 12
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.15)',
+            drawBorder: false,
+            lineWidth: 1
+          },
+          border: {
+            display: false,
+            dash: [5, 5]
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: 13,
+              family: "'Segoe UI', 'Inter', sans-serif",
+              weight: '700'
+            },
+            color: '#1E293B',
+            padding: 18
+          },
+          grid: {
+            display: false
+          },
+          border: {
+            display: false
+          }
+        }
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeOutQuart'
+      }
+    },
+    plugins: [{
+      id: 'customLabels',
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+        
+        meta.data.forEach((bar, index) => {
+          const data = chart.data.datasets[0].data[index];
+          
+          ctx.save();
+          
+          // Desenha o valor principal
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillStyle = '#0F172A';
+          ctx.font = 'bold 26px "Segoe UI", "Inter", sans-serif';
+          
+          const x = bar.x;
+          const y = bar.y - 30;
+          
+          ctx.fillText(data.toFixed(2).replace('.', ',') + '%', x, y);
+          
+          // Desenha "a.m" abaixo
+          ctx.font = '600 11px "Segoe UI", "Inter", sans-serif';
+          ctx.fillStyle = '#64748B';
+          ctx.textBaseline = 'top';
+          ctx.fillText('a.m', x, y + 5);
+          
+          ctx.restore();
+        });
+      }
+    }]
+  });
+});
+
+// ===== CARROSSEL DE VANTAGENS =====
+const btnAnterior = document.querySelector('.btn-anterior');
+const btnProximo = document.querySelector('.btn-proximo');
+const containerVantagens = document.querySelector('.container-vantagens');
+
+if (btnAnterior && btnProximo && containerVantagens) {
+  const scrollStep = 340;
+
+  btnProximo.addEventListener('click', () => {
+    containerVantagens.scrollBy({ left: scrollStep, behavior: 'smooth' });
+  });
+
+  btnAnterior.addEventListener('click', () => {
+    containerVantagens.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+  });
+
+  // ===== ARRASTAR COM O MOUSE =====
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  containerVantagens.addEventListener('mousedown', (e) => {
+    isDown = true;
+    containerVantagens.style.cursor = 'grabbing';
+    startX = e.pageX - containerVantagens.offsetLeft;
+    scrollLeft = containerVantagens.scrollLeft;
+  });
+
+  containerVantagens.addEventListener('mouseleave', () => {
+    isDown = false;
+    containerVantagens.style.cursor = 'grab';
+  });
+
+  containerVantagens.addEventListener('mouseup', () => {
+    isDown = false;
+    containerVantagens.style.cursor = 'grab';
+  });
+
+  containerVantagens.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - containerVantagens.offsetLeft;
+    const walk = (x - startX) * 2; // Velocidade do arrasto
+    containerVantagens.scrollLeft = scrollLeft - walk;
+  });
+}
+
+// ===== CARROSSEL DE GRÁFICOS =====
+const btnGraficoAnterior = document.querySelector('.btn-grafico-anterior');
+const btnGraficoProximo = document.querySelector('.btn-grafico-proximo');
+const slides = document.querySelectorAll('.grafico-slide');
+const indicadores = document.querySelectorAll('.indicador');
+let slideAtual = 0;
+
+function mostrarSlide(index) {
+  slides.forEach(slide => slide.classList.remove('ativo'));
+  indicadores.forEach(ind => ind.classList.remove('ativo'));
+  
+  slides[index].classList.add('ativo');
+  indicadores[index].classList.add('ativo');
+}
+
+if (btnGraficoProximo) {
+  btnGraficoProximo.addEventListener('click', () => {
+    slideAtual = (slideAtual + 1) % slides.length;
+    mostrarSlide(slideAtual);
+  });
+}
+
+if (btnGraficoAnterior) {
+  btnGraficoAnterior.addEventListener('click', () => {
+    slideAtual = (slideAtual - 1 + slides.length) % slides.length;
+    mostrarSlide(slideAtual);
+  });
+}
+
+indicadores.forEach((indicador, index) => {
+  indicador.addEventListener('click', () => {
+    slideAtual = index;
+    mostrarSlide(slideAtual);
+  });
+});
+
+// ===== ACCORDION =====
+const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+accordionHeaders.forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const wasActive = item.classList.contains('ativo');
+    
+    // Fecha todos os outros
+    accordionHeaders.forEach(h => {
+      h.parentElement.classList.remove('ativo');
+    });
+    
+    // Abre o clicado (se não estava ativo)
+    if (!wasActive) {
+      item.classList.add('ativo');
     }
   });
 });
 
-
-// === TOOLTIP DE AJUDA (❓) ===
-const infoBtn = document.getElementById('taxa-info');
-const tooltip = document.getElementById('tooltip');
-
-infoBtn.addEventListener('click', () => {
-  tooltip.classList.toggle('show');
-
-  // posiciona o tooltip abaixo do botão
-  const rect = infoBtn.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + window.scrollX}px`;
-  tooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+// ===== SMOOTH SCROLL PARA LINKS DO MENU =====
+document.querySelectorAll('.navbar a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 });
 
-// fecha o tooltip ao clicar fora
-document.addEventListener('click', (e) => {
-  if (!infoBtn.contains(e.target) && !tooltip.contains(e.target)) {
-    tooltip.classList.remove('show');
+// ====== BARRA DE PROGRESSO DE ROLAGEM ======
+window.addEventListener('scroll', () => {
+  const progressBar = document.getElementById('progressBar');
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  
+  const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
+  
+  if (progressBar) {
+    progressBar.style.width = scrollPercentage + '%';
   }
 });
 

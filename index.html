@@ -11,6 +11,11 @@
 </head>
 <body>
 
+  <!-- BARRA DE PROGRESSO DE ROLAGEM -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
   <!-- MENU -->
   <header>
     <nav class="navbar">
@@ -23,7 +28,7 @@
       <a href="#funciona">Como funciona</a>
       <a href="#obter">Como obter</a>
       <a href="#seguranca">Dicas de Segurança</a>
-      <a href="#simulador" class="highlight">Simulador</a>
+      <a href="#inicio" class="highlight">Simulador</a>
     </nav>
   </header>
 
@@ -32,11 +37,69 @@
     <div class="hero-text">
       <h1>Simule, Planeje e Escolha com Segurança</h1>
       <p>Descubra as melhores opções de crédito consignado de forma simples e transparente.</p>
-      <a href="#simulador" class="btn-hero">Fazer Simulação</a>
     </div>
-    <div class="card-imagem">
-      <img src="img/banner_homem_simulando.jpg" alt="Pessoa simulando empréstimo online" class="hero-img">
-    </div>    
+    <div class="hero-simulador">
+      <form id="form-simulador" aria-label="Simulador de Empréstimo" autocomplete="off">
+        <label for="valor">Valor do Empréstimo (R$)</label>
+        <input type="text" id="valor" placeholder="Ex: 10.000" autocomplete="off">
+
+        <label for="taxa">Taxa de Juros (% ao mês)
+          <button type="button" class="info-btn" id="taxa-info">?</button>
+          <div id="tooltip" class="tooltip">
+            Valor em porcentagem que incidirá mensalmente sobre o valor.
+          </div>
+        </label>
+        <input type="text" id="taxa" placeholder="Ex: 2,5" autocomplete="off">
+
+        <label for="prazo">Prazo (em meses)</label>
+        <input type="number" id="prazo" required aria-required="true" autocomplete="off">
+
+        <button type="submit">Simular</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: Resultado da Simulação e Gráficos -->
+  <section id="simulador" class="secao-resultado-completa oculto">
+    <div class="container-resultado-completo">
+      <h2>Resultado da Simulação</h2>
+      
+      <div class="layout-resultado">
+        <!-- Coluna Esquerda: Resultado -->
+        <div class="coluna-resultado">
+          <div id="resultado" aria-live="polite"></div>
+        </div>
+
+        <!-- Coluna Direita: Gráficos em Carrossel -->
+        <div class="coluna-graficos">
+          <h3 class="titulo-graficos">Análise Visual</h3>
+          
+          <div class="carrossel-graficos-wrapper">
+            <button class="btn-grafico btn-grafico-anterior" aria-label="Gráfico Anterior">
+              <span>&#8249;</span>
+            </button>
+            
+            <div class="container-carrossel-graficos">
+              <div class="grafico-slide ativo">
+                <canvas id="graficoLinha"></canvas>
+              </div>
+              <div class="grafico-slide">
+                <canvas id="graficoPizza"></canvas>
+              </div>
+            </div>
+            
+            <button class="btn-grafico btn-grafico-proximo" aria-label="Próximo Gráfico">
+              <span>&#8250;</span>
+            </button>
+          </div>
+          
+          <div class="indicadores-graficos">
+            <span class="indicador ativo" data-slide="0"></span>
+            <span class="indicador" data-slide="1"></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- SEÇÃO: O que é? -->
@@ -53,99 +116,175 @@
   </div>
 </section>
 
+<!-- SEÇÃO: Comparação de Taxas -->
+<section id="comparacao-taxas" class="secao-comparacao">
+  <div class="conteudo-comparacao">
+    <div class="texto-comparacao">
+      <h2>Consignado INSS com as melhores taxas!</h2>
+      <p>Empréstimo Consignado de até 1,85% ao mês para aposentados e pensionistas do INSS. Dinheiro rápido na sua conta com as melhores condições.</p>
+      <a href="#inicio" class="btn-simular-azul">Simule Agora</a>
+      <p class="nota-rodape">1- Taxa de juros mínima vigente do Empréstimo Consignado INSS do Banco PAN | 2- Fonte: Bacen Sistema Gerenciador de Séries Temporais (SGS) | 04/2025</p>
+    </div>
+    <div class="grafico-comparacao">
+      <canvas id="graficoComparacao" role="img" aria-label="Gráfico comparativo de taxas de juros"></canvas>
+    </div>
+  </div>
+</section>
+
 <!-- SEÇÃO: Vantagens -->
 <section id="vantagens" class="secao-vantagens">
-  <h2> Vantagens do Empréstimo Consignado</h2>
+  <h2>Vantagens do Empréstimo Consignado</h2>
   <p class="subtitulo">Descubra por que essa modalidade é uma das mais seguras e econômicas do mercado.</p>
 
-  <div class="container-vantagens">
-    <div class="card-vantagem">
-      <i class="fas fa-percent" aria-hidden="true"></i>
-      <h3>💰 Juros Reduzidos</h3>
-      <p>Taxas de juros menores do que empréstimos comuns.</p>
+  <div class="carrossel-wrapper">
+    <button class="btn-carrossel btn-anterior" aria-label="Anterior">
+      <span>&#8249;</span>
+    </button>
+    
+    <div class="container-vantagens">
+      <div class="card-vantagem">
+        <h3>💰 Juros Reduzidos</h3>
+        <p>Taxas de juros menores do que empréstimos comuns, proporcionando economia significativa ao longo do tempo.</p>
+      </div>
+
+      <div class="card-vantagem">
+        <h3>📅 Parcelas Fixas</h3>
+        <p>Pagamentos previsíveis com desconto automático da folha, sem risco de atraso ou inadimplência.</p>
+      </div>
+
+      <div class="card-vantagem">
+        <h3>🔒 Segurança</h3>
+        <p>Menor risco de inadimplência e mais controle financeiro para você e sua família.</p>
+      </div>
+
+      <div class="card-vantagem">
+        <h3>⚡ Aprovação Rápida</h3>
+        <p>Processo simplificado com análise de crédito facilitada e aprovação em menos tempo.</p>
+      </div>
+
+      <div class="card-vantagem">
+        <h3>📊 Prazos Maiores</h3>
+        <p>Possibilidade de parcelar em até 96 meses, reduzindo o valor das parcelas mensais.</p>
+      </div>
     </div>
 
-    <div class="card-vantagem">
-      <i class="fas fa-calendar-check" aria-hidden="true"></i>
-      <h3>📅 Parcelas Fixas</h3>
-      <p>Pagamentos previsíveis com desconto automático da folha.</p>
-    </div>
-
-    <div class="card-vantagem">
-      <i class="fas fa-shield-alt" aria-hidden="true"></i>
-      <h3>🔒 Segurança</h3>
-      <p>Menor risco de inadimplência e mais controle financeiro.</p>
-    </div>
+    <button class="btn-carrossel btn-proximo" aria-label="Próximo">
+      <span>&#8250;</span>
+    </button>
   </div>
 </section>
 
 
   <!-- SEÇÃO: Como funciona -->
-  <section id="funciona" class="content-section alt">
+  <section id="funciona" class="secao-como-funciona">
     <h2>Como funciona</h2>
-    <ol>
-      <li>Informe o valor, taxa e prazo no simulador.</li>
-      <li>Veja o cálculo automático das parcelas.</li>
-      <li>Compare e escolha a melhor opção.</li>
-      <li>Solicite o crédito à instituição de forma segura.</li>
-    </ol>
-  </section>
-
-  <!-- SEÇÃO: Como obter -->
-  <section id="obter" class="content-section">
-    <h2>Como obter seu Empréstimo Consignado</h2>
-    <ul>
-      <li>Ser funcionário de empresa conveniada ou beneficiário do INSS</li>
-      <li>Apresentar documentos e comprovantes de renda</li>
-      <li>Escolher um banco ou financeira autorizada</li>
-    </ul>
-  </section>
-
-  <!-- SEÇÃO: Dicas de Segurança -->
-  <section id="seguranca" class="content-section alt">
-    <h2>Dicas de Segurança</h2>
-    <ul>
-      <li>🔐 Não compartilhe dados por telefone ou e-mails suspeitos</li>
-      <li>🏦 Verifique se a instituição é autorizada pelo Banco Central</li>
-      <li>💡 Compare taxas e leia o contrato com atenção</li>
-      <li>🚫 Desconfie de promessas de crédito “sem consulta”</li>
-    </ul>
-  </section>
-
-  <!-- SEÇÃO: Simulador -->
-  <section id="simulador" class="content-section">
-    <h2>Simulador de Crédito Consignado</h2>
-    <div class="simulador">
-      <form id="form-simulador" aria-label="Simulador de Empréstimo">
-        <label for="valor">Valor do Empréstimo (R$)</label>
-        <!--<input type="number" id="valor" required aria-required="true">-->
-        <input type="text" id="valor" placeholder="Ex: 10.000">
-
-        <label for="taxa">Taxa de Juros (% ao mês)
-          <button type="button" class="info-btn" id="taxa-info">?</button>
-        </label>
-        <input type="text" id="taxa" placeholder="Ex: 2,5">
-        <div id="tooltip" class="tooltip">
-          Valor em porcentagem que incidirá mensalmente sobre o valor.
-        </div>
-
-        <label for="prazo">Prazo (em meses)</label>
-        <input type="number" id="prazo" required aria-required="true">
-
-        <button type="submit">Simular</button>
-      </form>
-      <div id="resultado" aria-live="polite"></div>
+    <div class="container-passos">
+      <div class="passo">
+        <div class="circulo-numero">1</div>
+        <h3>Informe os dados</h3>
+        <p>Informe o valor, taxa e prazo no simulador.</p>
+      </div>
+      <div class="linha-conectora"></div>
+      <div class="passo">
+        <div class="circulo-numero">2</div>
+        <h3>Veja o cálculo</h3>
+        <p>Veja o cálculo automático das parcelas.</p>
+      </div>
+      <div class="linha-conectora"></div>
+      <div class="passo">
+        <div class="circulo-numero">3</div>
+        <h3>Compare e escolha</h3>
+        <p>Compare e escolha a melhor opção.</p>
+      </div>
+      <div class="linha-conectora"></div>
+      <div class="passo">
+        <div class="circulo-numero">4</div>
+        <h3>Solicite o crédito</h3>
+        <p>Solicite o crédito à instituição de forma segura.</p>
+      </div>
     </div>
   </section>
 
-  <!-- SEÇÃO: Gráficos -->
-  <section>
-    <h2>Gráficos do resultado</h2>
-
-      <canvas id="graficoLinha"></canvas>
-      <div class="grafico grafico-pizza">
-        <canvas id="graficoPizza"></canvas>
+  <!-- SEÇÃO: Como obter -->
+  <section id="obter" class="secao-como-obter">
+    <h2>Como obter seu Empréstimo Consignado</h2>
+    <div class="container-requisitos">
+      <div class="card-requisito">
+        <div class="icone-requisito">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+          </svg>
+        </div>
+        <h3>Seriedade</h3>
+        <p>Ser funcionário de empresa conveniada ou beneficiário do INSS</p>
       </div>
+
+      <div class="card-requisito">
+        <div class="icone-requisito">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <h3>Agilidade</h3>
+        <p>Apresentar documentos e comprovantes de renda</p>
+      </div>
+
+      <div class="card-requisito">
+        <div class="icone-requisito">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h3>Diversificação</h3>
+        <p>Escolher um banco ou financeira autorizada</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: Dicas de Segurança -->
+  <section id="seguranca" class="secao-duvidas">
+    <h2>Dicas de Segurança</h2>
+    <div class="accordion-container">
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span>🔐 Não compartilhe dados por telefone ou e-mails suspeitos</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <p>Nunca forneça seus dados pessoais, senhas ou informações bancárias por telefone, e-mail ou mensagens de texto não solicitadas. Instituições financeiras legítimas nunca pedem essas informações por esses meios.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span>🏦 Verifique se a instituição é autorizada pelo Banco Central</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <p>Antes de contratar qualquer empréstimo, confirme se a instituição financeira está devidamente registrada e autorizada pelo Banco Central. Consulte o site oficial do Banco Central para verificar a lista de instituições autorizadas.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span>💡 Compare taxas e leia o contrato com atenção</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <p>Sempre compare as taxas de juros, tarifas e condições oferecidas por diferentes instituições. Leia todo o contrato antes de assinar, prestando atenção especial ao CET (Custo Efetivo Total), prazo e valor das parcelas.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span>🚫 Desconfie de promessas de crédito "sem consulta"</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <p>Ofertas de crédito aprovado sem análise ou consulta ao CPF são sinais de golpe. Empresas sérias sempre fazem análise de crédito antes de aprovar um empréstimo. Desconfie também de taxas muito abaixo da média do mercado.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <footer>

@@ -374,3 +374,20 @@ footer {
   outline: 3px solid var(--destaque);
   outline-offset: 3px;
 }
+
+#graficoLinha{
+  max-width: 500px;    
+  height: 300px;      
+  margin: 20px auto;   
+  display: block;      
+}
+
+.grafico-pizza{
+  width: 280px;
+  height: 280px;
+}
+
+.grafico-pizza canvas{
+  width: 100%;
+  height: 100%
+}

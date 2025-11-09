@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="img/logo.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -135,6 +136,16 @@
       </form>
       <div id="resultado" aria-live="polite"></div>
     </div>
+  </section>
+
+  <!-- SEÇÃO: Gráficos -->
+  <section>
+    <h2>Gráficos do resultado</h2>
+
+      <canvas id="graficoLinha"></canvas>
+      <div class="grafico grafico-pizza">
+        <canvas id="graficoPizza"></canvas>
+      </div>
   </section>
 
   <footer>

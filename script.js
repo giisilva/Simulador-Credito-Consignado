@@ -47,10 +47,10 @@ document.getElementById('form-simulador').addEventListener('submit', function(e)
   // Exibe resultado
   const resultado = document.getElementById('resultado');
   resultado.innerHTML = `
-    <p><strong>Valor da Parcela:</strong> R$ ${parcela.toFixed(2)}</p>
-    <p><strong>Total a Pagar:</strong> R$ ${totalPago.toFixed(2)}</p>
-    <p><strong>Total de Juros:</strong> R$ ${totalJuros.toFixed(2)}</p>
-    <p><strong>Total de Amortização:</strong> R$ ${totalAmortizacao.toFixed(2)}</p>
+  <p><strong>Valor da Parcela:</strong> R$ ${parcela.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+  <p><strong>Total a Pagar:</strong> R$ ${totalPago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+  <p><strong>Total de Juros:</strong> R$ ${totalJuros.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+  <p><strong>Total de Amortização:</strong> R$ ${totalAmortizacao.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
   `;
 
   // Mostra a seção de resultado
@@ -66,13 +66,50 @@ document.getElementById('form-simulador').addEventListener('submit', function(e)
 });
 
 // ===== FORMATAÇÃO DE INPUTS =====
-document.getElementById('valor').addEventListener('input', function(e) {
-  let valor = e.target.value.replace(/\D/g, '');
-  //valor = (valor / 100).toFixed(2);
-  valor = valor.replace('.', ',');
-  valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  e.target.value = valor;
+const inputValor = document.getElementById('valor');
+
+function formatarCurrencyBR(valorDigitado) {
+  // Remove tudo que não for dígito
+  const apenasDigitos = valorDigitado.replace(/\D/g, '');
+
+  if (!apenasDigitos) return '';
+  // Interpreta como centavos (para comportamento "automático" de máscara)
+  const n = (parseInt(apenasDigitos, 10) / 100).toFixed(2); // "1234.56"
+  // Separa parte inteira e decimal
+  const partes = n.split('.');
+  let inteiro = partes[0];
+  const decimal = partes[1];
+  // Formata milhares com ponto
+  inteiro = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  // Retorna no formato BR
+  return inteiro + ',' + decimal;
+}
+
+inputValor.addEventListener('input', function (e) {
+  const cursorPos = this.selectionStart; // tentar preservar cursor (simples)
+  const beforeLength = this.value.length;
+  // Se o usuário colou um valor com vírgula ou ponto (ex: "1500,75" ou "1500.75"), normalizamos:
+  let raw = e.target.value;
+  const formatted = formatarCurrencyBR(raw);
+  e.target.value = formatted;
+
+  // tentativa simples de preservar cursor aproximado
+  const afterLength = e.target.value.length;
+  const diff = afterLength - beforeLength;
+  try {
+    this.setSelectionRange(cursorPos + diff, cursorPos + diff);
+  } catch (err) {
+
+  }
 });
+
+// Função utilitária para obter valor numérico real (em float) a partir do campo formatado
+function pegarValorNumerico() {
+  const s = document.getElementById('valor').value;
+  if (!s) return 0;
+  // Remove pontos de milhar e troca vírgula por ponto decimal
+  return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+}
 
 document.getElementById('taxa').addEventListener('input', function(e) {
   let valor = e.target.value.replace(/[^\d,]/g, '');

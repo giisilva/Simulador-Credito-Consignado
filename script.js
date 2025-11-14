@@ -20,7 +20,7 @@ document.getElementById('form-simulador').addEventListener('submit', function(e)
   const prazo = parseInt(document.getElementById('prazo').value);
 
   // Limpa os valores (remove pontos, vírgulas e R$)
-  const valor = parseFloat(valorInput.replace(/[^\d,]/g, '').replace(',', '.'));
+  const valor = parseFloat(valorInput.replace(/\./g, '').replace(',', '.'));
   const taxa = parseFloat(taxaInput.replace(',', '.')) / 100;
 
   if (isNaN(valor) || isNaN(taxa) || isNaN(prazo) || valor <= 0 || taxa <= 0 || prazo <= 0) {
@@ -33,12 +33,24 @@ document.getElementById('form-simulador').addEventListener('submit', function(e)
   const totalPago = parcela * prazo;
   const totalJuros = totalPago - valor;
 
+  // total da amortização
+  let totalAmortizacao = 0;
+  let saldo = valor;
+  for (let i = 1; i <= prazo; i++) {
+    const jurosMes = saldo * taxa;
+    const amortizacao = parcela - jurosMes;
+    totalAmortizacao += amortizacao; // Soma a amortização do mês
+    saldo -= amortizacao;
+    if (saldo < 0) saldo = 0;
+  }
+
   // Exibe resultado
   const resultado = document.getElementById('resultado');
   resultado.innerHTML = `
     <p><strong>Valor da Parcela:</strong> R$ ${parcela.toFixed(2)}</p>
     <p><strong>Total a Pagar:</strong> R$ ${totalPago.toFixed(2)}</p>
     <p><strong>Total de Juros:</strong> R$ ${totalJuros.toFixed(2)}</p>
+    <p><strong>Total de Amortização:</strong> R$ ${totalAmortizacao.toFixed(2)}</p>
   `;
 
   // Mostra a seção de resultado
@@ -56,7 +68,7 @@ document.getElementById('form-simulador').addEventListener('submit', function(e)
 // ===== FORMATAÇÃO DE INPUTS =====
 document.getElementById('valor').addEventListener('input', function(e) {
   let valor = e.target.value.replace(/\D/g, '');
-  valor = (valor / 100).toFixed(2);
+  //valor = (valor / 100).toFixed(2);
   valor = valor.replace('.', ',');
   valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   e.target.value = valor;
@@ -106,24 +118,24 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
 
   // Calcula os valores
   const parcela = valor * (taxa * Math.pow(1 + taxa, prazo)) / (Math.pow(1 + taxa, prazo) - 1);
-  const totalPago = parcela * prazo;
+  //const totalPago = parcela * prazo;
 
   // Gráfico de Linha - Evolução dos Valores do Empréstimo
   const ctxLinha = document.getElementById('graficoLinha').getContext('2d');
   const dadosEvolucao = calcularEvolucaoValores(valor, taxa, prazo, parcela);
 
   // Criar gradientes para as linhas
-  const gradienteParcela = ctxLinha.createLinearGradient(0, 0, 0, 350);
-  gradienteParcela.addColorStop(0, 'rgba(13, 24, 42, 0.8)');
-  gradienteParcela.addColorStop(1, 'rgba(13, 24, 42, 0.3)');
+  const gradienteAmortizacao = ctxLinha.createLinearGradient(0, 0, 0, 350);
+  gradienteAmortizacao.addColorStop(0, 'rgba(0, 184, 148, 0.35)');
+  gradienteAmortizacao.addColorStop(1, 'rgba(0, 184, 148, 0.05)');
 
-  const gradienteTotalPago = ctxLinha.createLinearGradient(0, 0, 0, 350);
-  gradienteTotalPago.addColorStop(0, 'rgba(119, 141, 169, 0.8)');
-  gradienteTotalPago.addColorStop(1, 'rgba(119, 141, 169, 0.3)');
+  const gradienteSaldoDevedor = ctxLinha.createLinearGradient(0, 0, 0, 350);
+  gradienteSaldoDevedor.addColorStop(0, 'rgba(99, 110, 114, 0.25)');
+  gradienteSaldoDevedor.addColorStop(1, 'rgba(99, 110, 114, 0.05)');
 
   const gradienteJuros = ctxLinha.createLinearGradient(0, 0, 0, 350);
-  gradienteJuros.addColorStop(0, 'rgba(160, 174, 192, 0.8)');
-  gradienteJuros.addColorStop(1, 'rgba(160, 174, 192, 0.3)');
+  gradienteJuros.addColorStop(0, 'rgba(214, 48, 49, 0.25)');
+  gradienteJuros.addColorStop(1, 'rgba(214, 48, 49, 0.05)');
 
   graficoLinha = new Chart(ctxLinha, {
     type: 'line',
@@ -131,53 +143,53 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
       labels: dadosEvolucao.meses,
       datasets: [
         {
-          label: 'Parcela Mensal',
-          data: dadosEvolucao.parcelas,
-          borderColor: '#0D182A',
-          backgroundColor: gradienteParcela,
+          label: `Amortizações: R$ ${dadosEvolucao.amortizacoes[dadosEvolucao.amortizacoes.length - 1].toLocaleString('pt-BR', {minimumFractionDigits: 2})}`,
+          data: dadosEvolucao.amortizacoes,
+          borderColor: '#00B894',
+          backgroundColor: gradienteAmortizacao,
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#0D182A',
+          pointBackgroundColor: '#00B894',
           pointBorderColor: '#fff',
           pointBorderWidth: 3,
           pointRadius: 5,
           pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#0D182A',
+          pointHoverBackgroundColor: '#00B894',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 3
         },
         {
-          label: 'Total Pago',
-          data: dadosEvolucao.totaisPagos,
-          borderColor: '#778DA9',
-          backgroundColor: gradienteTotalPago,
+          label: `Saldo Devedor: R$ ${dadosEvolucao.saldosDevedores[0].toLocaleString('pt-BR', {minimumFractionDigits: 2})}`,
+          data: dadosEvolucao.saldosDevedores,
+          borderColor: '#636E72',
+          backgroundColor: gradienteSaldoDevedor,
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#778DA9',
+          pointBackgroundColor: '#636E72',
           pointBorderColor: '#fff',
           pointBorderWidth: 3,
           pointRadius: 5,
           pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#778DA9',
+          pointHoverBackgroundColor: '#636E72',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 3
         },
         {
-          label: 'Total de Juros',
-          data: dadosEvolucao.totaisJuros,
-          borderColor: '#A0AEC0',
+          label: `Juros Mensais: R$ ${dadosEvolucao.jurosMensais[0].toLocaleString('pt-BR', {minimumFractionDigits: 2})}`,
+          data: dadosEvolucao.jurosMensais,
+          borderColor: '#D63031',
           backgroundColor: gradienteJuros,
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#A0AEC0',
+          pointBackgroundColor: '#D63031',
           pointBorderColor: '#fff',
           pointBorderWidth: 3,
           pointRadius: 5,
           pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#A0AEC0',
+          pointHoverBackgroundColor: '#D63031',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 3
         }
@@ -245,7 +257,17 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
           boxPadding: 6,
           callbacks: {
             label: function(context) {
-              return context.dataset.label + ': R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+              const labelLimpo = context.dataset.label.replace(/: R\$.*$/, '');
+
+              if (labelLimpo.includes('juros')){
+                const jurosTotal = dadosEvolucao.totaisJuros[context.dataIndex];
+                return `Juros total: R$ ${jurosTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+              }
+              
+              return `${labelLimpo}: R$ ${context.parsed.y.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}`;
             }
           }
         }
@@ -311,10 +333,12 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
   graficoPizza = new Chart(ctxPizza, {
     type: 'doughnut',
     data: {
-      labels: ['Valor Emprestado', 'Total de Juros'],
+      labels: [
+        `Valor Emprestado: R$ ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, `Total de Juros: R$ ${totalJuros.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+      ],
       datasets: [{
         data: [valor, totalJuros],
-        backgroundColor: ['#0D182A', '#778DA9'],
+        backgroundColor: ['#0D182A', '#D63031'],
         borderWidth: 4,
         borderColor: '#fff',
         hoverBorderWidth: 5,
@@ -359,9 +383,13 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
           cornerRadius: 10,
           callbacks: {
             label: function(context) {
+              const labelLimpo = context.label.replace(/: R\$.*$/, '');
               const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const percentage = ((context.parsed / total) * 100).toFixed(1);
-              return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ' (' + percentage + '%)';
+              return `${labelLimpo}: R$ ${context.parsed.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })} (${percentage}%)`;
             }
           }
         }
@@ -379,37 +407,37 @@ function gerarGraficos(valor, totalJuros, taxa, prazo) {
 // ===== FUNÇÃO AUXILIAR - CALCULAR EVOLUÇÃO DOS VALORES =====
 function calcularEvolucaoValores(valor, taxa, prazo, parcela) {
   const meses = [];
-  const parcelas = [];
-  const totaisPagos = [];
+  const amortizacoes = [];
+  const jurosMensais = [];
   const totaisJuros = [];
+  const saldosDevedores = [];
   
   let saldo = valor;
   let totalPagoAcumulado = 0;
   let totalJurosAcumulado = 0;
 
   for (let i = 1; i <= prazo; i++) {
-    meses.push('Mês ' + i);
-    
-    // Parcela mensal é constante
-    parcelas.push(parseFloat(parcela.toFixed(2)));
     
     // Calcula juros do mês
     const jurosMes = saldo * taxa;
     const amortizacao = parcela - jurosMes;
     
-    // Acumula valores
-    totalPagoAcumulado += parcela;
-    totalJurosAcumulado += jurosMes;
-    
-    totaisPagos.push(parseFloat(totalPagoAcumulado.toFixed(2)));
-    totaisJuros.push(parseFloat(totalJurosAcumulado.toFixed(2)));
-    
     // Atualiza saldo
     saldo -= amortizacao;
     if (saldo < 0) saldo = 0;
+    
+    // Acumula valores
+    totalPagoAcumulado += parcela;
+    totalJurosAcumulado += jurosMes;
+
+    meses.push(`Mês ${i}`);
+    amortizacoes.push(parseFloat(amortizacao.toFixed(2)));
+    jurosMensais.push(parseFloat(jurosMes.toFixed(2)));
+    totaisJuros.push(parseFloat(totalJurosAcumulado.toFixed(2)));
+    saldosDevedores.push(parseFloat(saldo.toFixed(2)));
   }
 
-  return { meses, parcelas, totaisPagos, totaisJuros };
+  return { meses, amortizacoes, jurosMensais, totaisJuros, saldosDevedores };
 }
 
 // ===== GRÁFICO DE COMPARAÇÃO DE TAXAS =====
